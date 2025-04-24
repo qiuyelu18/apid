@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
         name="viewport" />
-    <meta content="土豆在线安装,土豆下载,土豆加速器,土豆账号,土豆,土豆vpn" name="keywords" />
+    <meta content="土豆在线安装,土豆下载,土豆账号,土豆" name="keywords" />
     <meta content="提供免费的苹果账号用于在线安装Potato(土豆)，包括美区Apple ID和详细使用教程" name="description" />
     <title>最新可用免费共享土豆账号美区Apple id</title>
     <meta content="最新可用免费共享土豆账号美区Apple id" property="og:title" />
@@ -33,6 +33,26 @@
         :root {
             --bs-success-rgb: 111, 208, 136;
         }
+        
+        .tutorial-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .img-toggle {
+            cursor: pointer;
+            color: #0d6efd;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .img-toggle:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -44,7 +64,7 @@
         <h1 class="mb-3 fw-normal">Potato (土豆)</h1>
         <div class="mx-1 row justify-content-center">
             <ol class="col-auto text-start">
-                <li>打开iPhone/iPad的蓝色<strong>&nbsp AppStore &nbsp</strong>软件（请不要打开设置）</li>
+                <li>打开iPhone/iPad的蓝色<strong>&nbsp AppStore &nbsp</strong>软件（请不要在设置中登录）</li>
                 <li>右上角点击<strong>&nbsp 个人头像&nbsp </strong>进入账户，下拉到最底找到并点击<strong>&nbsp 退出登录&nbsp</strong></li>
                 <li><strong> &nbsp复制&nbsp</strong>本网站 共享账号和密码</li>
                 <li>点击登录，提示<strong> &nbspApple id安全&nbsp</strong>，请点击<strong> &nbsp其他选项-不升级&nbsp</strong></li>
@@ -55,6 +75,12 @@
                 </li>
                 <li>用完务必<strong>&nbsp退出登录&nbsp</strong>，避免你的手机被锁</li>
             </ol>
+            <div class="col-auto text-center">
+                <span class="img-toggle" id="toggleTutorial"><i class="bi bi-image"></i> 点击查看图文教程</span>
+                <div class="tutorial-container">
+                    <img src="https://tgimg.langtest.online/file/1745496804709_image.png" alt="土豆安装图文教程" class="tutorial-img" id="tutorialImg">
+                </div>
+            </div>
         </div>
         <div class="row text-start justify-content-center" id="apple">
             <div class="col-auto my-5" id="loading"><i aria-hidden="true" class="spinner-border me-5"></i> 加载最新账号信息
@@ -71,7 +97,23 @@
     <script src="./src/data.min.js" type="application/javascript"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWCME7N22C"></script>
     <script charset="utf-8" type="text/javascript">
-        $(document).ready(function () { function a() { o.push(arguments) } X(); window.o = window.o || []; a("js", new Date); a("config", "G-JWCME7N22C") });
+        $(document).ready(function () { 
+            function a() { o.push(arguments) } 
+            X(); 
+            window.o = window.o || []; 
+            a("js", new Date); 
+            a("config", "G-JWCME7N22C");
+            
+            // 图片折叠功能
+            $("#toggleTutorial").click(function() {
+                $("#tutorialImg").slideToggle();
+                if($(this).html().indexOf("查看") > -1) {
+                    $(this).html('<i class="bi bi-image"></i> 点击隐藏图文教程');
+                } else {
+                    $(this).html('<i class="bi bi-image"></i> 点击查看图文教程');
+                }
+            });
+        });
     </script>
 </body>
 
