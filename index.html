@@ -40,24 +40,46 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             margin-top: 15px;
-            display: none;
-            /* 防止图片闪烁 */
+            /* 平滑过渡 */
             opacity: 1;
             transition: opacity 0.3s ease;
         }
         
-        .img-toggle {
-            cursor: pointer;
-            color: #0d6efd;
-            display: inline-block;
-            margin: 10px 0;
+        /* 折叠面板样式 */
+        .collapse-panel {
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: 0.375rem;
+            margin-top: 20px;
+            background-color: #fff;
+            overflow: hidden;
         }
         
-        .img-toggle:hover {
-            text-decoration: underline;
+        .collapse-header {
+            padding: 12px 16px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 500;
+            color: #333;
+            transition: background-color 0.2s ease;
         }
-
-        /* 添加加载指示器样式 */
+        
+        .collapse-header:hover {
+            background-color: #f1f3f5;
+        }
+        
+        .collapse-content {
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .collapse-content.show {
+            padding: 16px;
+        }
+        
+        /* 加载指示器样式 */
         .loading-indicator {
             display: none;
             margin: 15px auto;
@@ -84,10 +106,20 @@
                 </li>
                 <li>用完务必<strong>&nbsp退出登录&nbsp</strong>，避免你的手机被锁</li>
             </ol>
-            <div class="col-auto text-center">
-                <span class="img-toggle" id="toggleTutorial"><i class="bi bi-image"></i> 点击查看图文教程</span>
-                <div class="tutorial-container">
-                    <img src="https://tgimg.langtest.online/file/1745496804709_image.png" alt="土豆安装图文教程" class="tutorial-img" id="tutorialImg">
+            <div class="col-auto text-center w-100">
+                <div class="collapse-panel">
+                    <div class="collapse-header" id="tutorialHeader">
+                        <span><i class="bi bi-image me-2"></i>图文安装教程</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="collapse collapse-content" id="tutorialContent">
+                        <div class="text-center position-relative">
+                            <div class="spinner-border text-primary loading-indicator" role="status" id="loadingIndicator">
+                                <span class="visually-hidden">加载中...</span>
+                            </div>
+                            <img src="https://tgimg.langtest.online/file/1745496804709_image.png" alt="土豆安装图文教程" class="tutorial-img" id="tutorialImg">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,44 +145,45 @@
             a("js", new Date); 
             a("config", "G-JWCME7N22C");
             
-            // 图片折叠功能
-            // 预加载图片
+            // 折叠面板功能
+            const tutorialHeader = $("#tutorialHeader");
+            const tutorialContent = $("#tutorialContent");
             const tutorialImg = $("#tutorialImg");
-            const imgSrc = tutorialImg.attr("src");
+            const loadingIndicator = $("#loadingIndicator");
+            const chevronIcon = tutorialHeader.find(".bi-chevron-down");
             
-            // 创建新图片对象预加载
+            // 预加载图片
             const preloadImg = new Image();
-            preloadImg.src = imgSrc;
+            preloadImg.src = tutorialImg.attr("src");
             
-            // 添加加载指示器
-            const loadingIndicator = $('<div class="spinner-border text-primary loading-indicator" role="status"><span class="visually-hidden">加载中...</span></div>');
-            $(".tutorial-container").append(loadingIndicator);
+            // 图片加载完成时隐藏加载指示器
+            $(preloadImg).on('load', function() {
+                loadingIndicator.hide();
+                tutorialImg.show();
+            });
             
-            $("#toggleTutorial").click(function() {
-                if(tutorialImg.is(":hidden")) {
-                    // 如果图片还没加载完成，显示加载指示器
-                    if(!preloadImg.complete) {
-                        loadingIndicator.show();
-                        
-                        // 监听图片加载完成事件
-                        $(preloadImg).on('load', function() {
-                            loadingIndicator.hide();
-                            tutorialImg.slideDown();
-                        });
-                    } else {
-                        // 图片已加载完成，直接显示
-                        tutorialImg.slideDown();
-                    }
+            // 折叠面板点击事件
+            tutorialHeader.on('click', function() {
+                tutorialContent.collapse('toggle');
+                
+                // 切换图标方向
+                if (tutorialContent.hasClass('show')) {
+                    chevronIcon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
                 } else {
-                    // 隐藏图片
-                    tutorialImg.slideUp();
+                    chevronIcon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
                 }
                 
-                if($(this).html().indexOf("查看") > -1) {
-                    $(this).html('<i class="bi bi-image"></i> 点击隐藏图文教程');
-                } else {
-                    $(this).html('<i class="bi bi-image"></i> 点击查看图文教程');
+                // 首次打开时显示加载指示器
+                if (!tutorialContent.hasClass('show') && !preloadImg.complete) {
+                    loadingIndicator.show();
                 }
+            });
+            
+            // 监听折叠事件来更新图标
+            tutorialContent.on('shown.bs.collapse', function () {
+                chevronIcon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
+            }).on('hidden.bs.collapse', function () {
+                chevronIcon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
             });
         });
     </script>
