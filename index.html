@@ -41,6 +41,9 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             margin-top: 15px;
             display: none;
+            /* 防止图片闪烁 */
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
         
         .img-toggle {
@@ -52,6 +55,12 @@
         
         .img-toggle:hover {
             text-decoration: underline;
+        }
+
+        /* 添加加载指示器样式 */
+        .loading-indicator {
+            display: none;
+            margin: 15px auto;
         }
     </style>
 </head>
@@ -105,8 +114,38 @@
             a("config", "G-JWCME7N22C");
             
             // 图片折叠功能
+            // 预加载图片
+            const tutorialImg = $("#tutorialImg");
+            const imgSrc = tutorialImg.attr("src");
+            
+            // 创建新图片对象预加载
+            const preloadImg = new Image();
+            preloadImg.src = imgSrc;
+            
+            // 添加加载指示器
+            const loadingIndicator = $('<div class="spinner-border text-primary loading-indicator" role="status"><span class="visually-hidden">加载中...</span></div>');
+            $(".tutorial-container").append(loadingIndicator);
+            
             $("#toggleTutorial").click(function() {
-                $("#tutorialImg").slideToggle();
+                if(tutorialImg.is(":hidden")) {
+                    // 如果图片还没加载完成，显示加载指示器
+                    if(!preloadImg.complete) {
+                        loadingIndicator.show();
+                        
+                        // 监听图片加载完成事件
+                        $(preloadImg).on('load', function() {
+                            loadingIndicator.hide();
+                            tutorialImg.slideDown();
+                        });
+                    } else {
+                        // 图片已加载完成，直接显示
+                        tutorialImg.slideDown();
+                    }
+                } else {
+                    // 隐藏图片
+                    tutorialImg.slideUp();
+                }
+                
                 if($(this).html().indexOf("查看") > -1) {
                     $(this).html('<i class="bi bi-image"></i> 点击隐藏图文教程');
                 } else {
