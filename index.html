@@ -84,6 +84,43 @@
             display: none;
             margin: 15px auto;
         }
+        
+        /* 图片查看器样式 */
+        .image-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1050;
+            overflow: auto;
+            padding: 10px;
+        }
+        
+        .image-viewer img {
+            display: block;
+            max-width: 100%;
+            max-height: 90vh;
+            margin: 30px auto;
+            object-fit: contain;
+        }
+        
+        .close-viewer {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1060;
+        }
+        
+        /* 可点击图片样式 */
+        .tutorial-img {
+            cursor: zoom-in;
+        }
     </style>
 </head>
 
@@ -126,6 +163,12 @@
         <div class="row text-start justify-content-center" id="apple">
             <div class="col-auto my-5" id="loading"><i aria-hidden="true" class="spinner-border me-5"></i> 加载最新账号信息
             </div>
+        </div>
+        
+        <!-- 图片查看器 -->
+        <div class="image-viewer" id="imageViewer">
+            <span class="close-viewer" id="closeViewer">&times;</span>
+            <img id="viewerImage" src="" alt="放大查看">
         </div>
     </main>
     <textarea id="copy" readonly="readonly" style="display: none;"></textarea>
@@ -184,6 +227,31 @@
                 chevronIcon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
             }).on('hidden.bs.collapse', function () {
                 chevronIcon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
+            });
+            
+            // 图片点击放大查看
+            const imageViewer = $("#imageViewer");
+            const viewerImage = $("#viewerImage");
+            const closeViewer = $("#closeViewer");
+            
+            // 点击图片时打开查看器
+            tutorialImg.on('click', function() {
+                viewerImage.attr('src', $(this).attr('src'));
+                imageViewer.fadeIn();
+                $('body').css('overflow', 'hidden'); // 防止背景滚动
+            });
+            
+            // 点击关闭按钮或背景关闭查看器
+            closeViewer.on('click', function() {
+                imageViewer.fadeOut();
+                $('body').css('overflow', '');
+            });
+            
+            imageViewer.on('click', function(e) {
+                if (e.target === this) {
+                    imageViewer.fadeOut();
+                    $('body').css('overflow', '');
+                }
             });
         });
     </script>
