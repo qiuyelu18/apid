@@ -190,6 +190,27 @@
             cursor: pointer;
         }
         
+        /* 醒目的标题样式 */
+        .wechat-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ff4d4f;
+            padding: 8px 5px;
+            border-radius: 4px;
+            background-color: #fff1f0;
+            border: 1px dashed #ffccc7;
+            animation: pulse 1.5s infinite;
+            white-space: normal; /* 允许文本换行 */
+            line-height: 1.4;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 77, 79, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0); }
+        }
+        
         .wechat-id {
             background-color: #f1f1f1;
             padding: 5px 10px;
@@ -287,7 +308,7 @@
         <div class="wechat-modal" id="wechatModal">
             <div class="wechat-content">
                 <span class="wechat-close" id="closeWechat">&times;</span>
-                <h5>闲鱼平台违规无法讨论，请加微信咨询</h5>
+                <div class="wechat-title">闲鱼平台违规无法讨论，请加微信咨询</div>
                 <img class="wechat-qr" src="https://tgimg.langtest.online/file/1746167084350_7bd780d16a27bfb4d50cd2ee95e4f60.jpg" alt="微信二维码">
                 <p>或微信搜索添加:</p>
                 <div class="wechat-id" id="wechatId">_qiyue0907</div>
