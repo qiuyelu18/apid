@@ -366,6 +366,57 @@
             a("js", new Date); 
             a("config", "G-JWCME7N22C");
             
+            // 强制提示弹窗
+            function showTimedAlert() {
+                // 检查是否在10分钟内已经显示过
+                const lastShown = localStorage.getItem('alertLastShown');
+                const now = new Date().getTime();
+                
+                // 如果没有显示过或者已经过了10分钟
+                if (!lastShown || (now - parseInt(lastShown)) > 10 * 60 * 1000) {
+                    let timerInterval;
+                    swal({
+                        title: '重要提示',
+                        html: '<div style="font-size: 18px; color: red; font-weight: bold; margin-bottom: 15px;">禁止在设置中登录，登录教程请看图片</div>' +
+                              '<div style="font-style: italic; color: #666;">此窗口将在 <strong><span id="alert-timer">3</span></strong> 秒后可关闭</div>',
+                        type: 'warning',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        showConfirmButton: false,
+                        showCancelButton: false,
+                        onOpen: () => {
+                            // 倒计时
+                            let count = 3;
+                            document.getElementById('alert-timer').textContent = count;
+                            
+                            timerInterval = setInterval(() => {
+                                count--;
+                                document.getElementById('alert-timer').textContent = count;
+                                
+                                // 倒计时结束
+                                if (count <= 0) {
+                                    clearInterval(timerInterval);
+                                    swal.setDefaults({
+                                        confirmButtonText: '我知道了'
+                                    });
+                                    swal.enableConfirmButton();
+                                    swal.showConfirmButton();
+                                }
+                            }, 1000);
+                        },
+                        onClose: () => {
+                            clearInterval(timerInterval);
+                            // 保存显示时间
+                            localStorage.setItem('alertLastShown', now.toString());
+                        }
+                    });
+                }
+            }
+            
+            // 页面加载后显示弹窗
+            showTimedAlert();
+            
             // 折叠面板功能
             const tutorialHeader = $("#tutorialHeader");
             const tutorialContent = $("#tutorialContent");
