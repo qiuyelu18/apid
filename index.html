@@ -271,6 +271,68 @@
             margin-right: 5px;
             font-size: 1.1em;
         }
+        
+        /* 强制弹窗样式 */
+        .force-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .force-modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            width: 350px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .force-modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ff4d4f;
+        }
+        
+        .force-modal-message {
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .force-modal-timer {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .force-modal-close {
+            background-color: #ddd;
+            color: #333;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: not-allowed;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .force-modal-close.active {
+            background-color: #1890ff;
+            color: white;
+            cursor: pointer;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -348,6 +410,18 @@
                 <button class="copy-btn" id="copyWechat">复制微信号</button>
             </div>
         </div>
+        
+        <!-- 强制提示弹窗 -->
+        <div class="force-modal" id="forceModal">
+            <div class="force-modal-content">
+                <div class="force-modal-title">重要提示</div>
+                <div class="force-modal-message">
+                    <strong>禁止在设置中登录，登录教程请看图片</strong>
+                </div>
+                <div class="force-modal-timer">请等待 <span id="countdown">3</span> 秒</div>
+                <button class="force-modal-close" id="forceModalClose">关闭</button>
+            </div>
+        </div>
     </main>
     <textarea id="copy" readonly="readonly" style="display: none;"></textarea>
     <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/js/bootstrap.min.js"
@@ -365,57 +439,6 @@
             window.o = window.o || []; 
             a("js", new Date); 
             a("config", "G-JWCME7N22C");
-            
-            // 强制提示弹窗
-            function showTimedAlert() {
-                // 检查是否在10分钟内已经显示过
-                const lastShown = localStorage.getItem('alertLastShown');
-                const now = new Date().getTime();
-                
-                // 如果没有显示过或者已经过了10分钟
-                if (!lastShown || (now - parseInt(lastShown)) > 10 * 60 * 1000) {
-                    let timerInterval;
-                    swal({
-                        title: '重要提示',
-                        html: '<div style="font-size: 18px; color: red; font-weight: bold; margin-bottom: 15px;">禁止在设置中登录，登录教程请看图片</div>' +
-                              '<div style="font-style: italic; color: #666;">此窗口将在 <strong><span id="alert-timer">3</span></strong> 秒后可关闭</div>',
-                        type: 'warning',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        showConfirmButton: false,
-                        showCancelButton: false,
-                        onOpen: () => {
-                            // 倒计时
-                            let count = 3;
-                            document.getElementById('alert-timer').textContent = count;
-                            
-                            timerInterval = setInterval(() => {
-                                count--;
-                                document.getElementById('alert-timer').textContent = count;
-                                
-                                // 倒计时结束
-                                if (count <= 0) {
-                                    clearInterval(timerInterval);
-                                    swal.setDefaults({
-                                        confirmButtonText: '我知道了'
-                                    });
-                                    swal.enableConfirmButton();
-                                    swal.showConfirmButton();
-                                }
-                            }, 1000);
-                        },
-                        onClose: () => {
-                            clearInterval(timerInterval);
-                            // 保存显示时间
-                            localStorage.setItem('alertLastShown', now.toString());
-                        }
-                    });
-                }
-            }
-            
-            // 页面加载后显示弹窗
-            showTimedAlert();
             
             // 折叠面板功能
             const tutorialHeader = $("#tutorialHeader");
@@ -521,6 +544,55 @@
                 // 显示复制成功提示
                 swal("复制成功", "微信号已复制到剪贴板", "success");
             });
+            
+            // 强制弹窗功能
+            const forceModal = $("#forceModal");
+            const forceModalClose = $("#forceModalClose");
+            const countdownSpan = $("#countdown");
+            const forceModalKey = "force_modal_shown";
+            const forceModalExpire = "force_modal_expire";
+            
+            // 检查是否需要显示弹窗
+            function checkForceModal() {
+                const shownBefore = localStorage.getItem(forceModalKey);
+                const expireTime = localStorage.getItem(forceModalExpire);
+                const now = new Date().getTime();
+                
+                // 如果10分钟内已经显示过，则不再显示
+                if (shownBefore && expireTime && now < parseInt(expireTime)) {
+                    return;
+                }
+                
+                // 显示弹窗并设置10分钟有效期
+                forceModal.css('display', 'flex');
+                localStorage.setItem(forceModalKey, 'true');
+                localStorage.setItem(forceModalExpire, (now + 10 * 60 * 1000).toString());
+                
+                // 开始倒计时
+                let countdown = 3;
+                countdownSpan.text(countdown);
+                
+                const timer = setInterval(function() {
+                    countdown--;
+                    countdownSpan.text(countdown);
+                    
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        forceModalClose.addClass('active');
+                        forceModalClose.prop('disabled', false);
+                    }
+                }, 1000);
+                
+                // 绑定关闭按钮事件
+                forceModalClose.on('click', function() {
+                    if ($(this).hasClass('active')) {
+                        forceModal.hide();
+                    }
+                });
+            }
+            
+            // 页面加载完成后显示弹窗
+            setTimeout(checkForceModal, 500);
         });
     </script>
 </body>
